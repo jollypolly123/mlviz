@@ -1,6 +1,8 @@
 <script lang="ts">
 	import cytoscape from "cytoscape";
 
+    export let states: string[];
+
     let graphDiv: HTMLDivElement;
   
 	const init = (container: HTMLElement) => {
@@ -15,22 +17,19 @@
 	}
 
 	$: init(graphDiv);
+    $: console.log(states);
 
 	const container = true;
 
 </script>
 
-<style>
-    .container {
-        width: 100%;
-        height: 50vh;
-    }
-
-/* :global(*) {
-	--primary-color: #27ccc0;
-	font-family: sans-serif;
-} */
-</style>
 
 <div class:container bind:this={graphDiv}>
 </div>
+
+<style>
+    .container {
+        height: 50vh;
+        border: 1px solid black;
+    }
+</style>
