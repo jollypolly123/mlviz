@@ -1,6 +1,8 @@
 <script>
 	import Header from './Header.svelte';
 	import './styles.css';
+    import { theme } from "$lib/stores";
+	// TODO: change styles.css based on theme variable in store
 </script>
 
 <div class="app">

@@ -20,10 +20,7 @@
 		</span>
 	</h1>
 
-	<p>
-		The <a href="/sverdle">Sverdle</a> page illustrates SvelteKit's data loading and form handling. Try
-		using it with JavaScript disabled!
-	</p>
+	<p>Beegubeegu</p>
 	<h2>Hohohohohohohoho</h2>
 	<p>Heeheeheheheheehheheheheh</p>
 	<Counter />

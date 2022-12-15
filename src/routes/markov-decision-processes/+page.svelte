@@ -22,16 +22,12 @@
             <!-- add tags https://stackoverflow.com/questions/49527155/tag-key-how-to-add-an-tag-while-pressing-enter-button -->
             <form>
                 <h4>MDP Definition</h4>
-                <Tags bind:tags={states} placeholder="States"/>
-                <label for="states">Type the name of a state then press enter</label>
-                <input type="text" name="transitions" placeholder="Transitions" />
-                <label for="transitions">Type the name of a transition then select a start and end state</label>
+                <Tags bind:tags={states} placeholder="States" title="Type the name of a state then press enter"/>
+                <input type="text" name="transitions" placeholder="Transitions" title="Type the name of a transition then select a start and end state" />
                 <!-- bind states -->
-                <input type="text" name="actions" placeholder="Actions" />
-                <label for="actions">Type the name of a action then select a start and end state</label>
+                <input type="text" name="actions" placeholder="Actions" title="Type the name of a action then select a start and end state" />
                 <!-- bind states -->
-                <input type="text" name="rewards" placeholder="Rewards" />
-                <label for="transitions">Select an action and assign a reward</label>
+                <input type="text" name="rewards" placeholder="Rewards" title="Select an action and assign a reward"/>
                 <!-- bind states -->
                 <h5><i>Automatically generates your graph!</i></h5>
             </form>
@@ -39,12 +35,12 @@
         <div class="inputs">
             <form>
                 <h4>Training Hyperparameters</h4>
-                <input type="text" name="discount" placeholder="Discount value (gamma)" />
-                <input type="text" name="learning" placeholder="Learning rate" />
-                <input type="text" name="epsilon" placeholder="Epsilon" />
-                <input type="text" name="horizon" placeholder="Horizon" />
-                <input type="text" name="iterations" placeholder="Number of iterations" />
-                <input type="submit" on:click={() => console.log("Calculate something")} value="Calculate" />
+                <input disabled type="text" name="discount" placeholder="Discount value (gamma)" />
+                <input disabled type="text" name="learning" placeholder="Learning rate" />
+                <input disabled type="text" name="epsilon" placeholder="Epsilon" />
+                <input disabled type="text" name="horizon" placeholder="Horizon" />
+                <input disabled type="text" name="iterations" placeholder="Number of iterations" />
+                <input disabled type="submit" on:click={() => console.log("Calculate something")} value="Calculate" />
             </form>
         </div>
         <div class="viz">

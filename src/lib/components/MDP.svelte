@@ -1,31 +1,36 @@
 <script lang="ts">
 	import cytoscape from "cytoscape";
+    import { randInt } from "$lib/utils";
 
     export let states: string[];
 
     let graphDiv: HTMLDivElement;
+    let cy: cytoscape.Core;
   
 	const init = (container: HTMLElement) => {
-        const cy = cytoscape({
+        cy = cytoscape({
             container: container,
-            elements: [
-                { data: { id: 'a' } },
-                { data: { id: 'b' } },
-                { data: { id: 'ab', source: 'a', target: 'b' } }
-            ]
+            elements: [],
         });
 	}
 
+    const addNodes = (cy: cytoscape.Core, states: string[]) => {
+        cy.add(states.map((state) => ({ 
+            group: 'nodes', 
+            data: { id: state },
+            position: { x: randInt(10, cy.width()-10), y: randInt(10, cy.height()-10) }
+        })));
+    }
+
 	$: init(graphDiv);
-    $: console.log(states);
+    $: addNodes(cy, states);
 
 	const container = true;
 
 </script>
 
 
-<div class:container bind:this={graphDiv}>
-</div>
+<div class:container bind:this={graphDiv} />
 
 <style>
     .container {
