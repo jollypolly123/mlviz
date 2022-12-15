@@ -10,6 +10,7 @@
 	--color-theme-1: #c419d3;
 	--color-theme-2: #361a90;
 	--color-text: rgba(0, 0, 0, 0.7);
+	--color-text-light: rgba(0, 0, 0, 0.3);
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
 	font-family: var(--font-body);
@@ -78,10 +79,23 @@ pre {
 	margin: 0 auto;
 }
 
+.tool {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-around;
+}
+
 input,
 button {
 	font-size: inherit;
 	font-family: inherit;
+}
+
+input[type='text'], input[type='password'], input[type='submit'] {
+	border: 1px solid var(--color-text-light);
+	border-radius: 3px;
+	padding: 0.5em;
 }
 
 button:focus:not(:focus-visible) {

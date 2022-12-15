@@ -12,19 +12,20 @@
 <section>
 	<h1>
 		<span class="welcome">
-			<picture>
+			<!-- <picture>
 				<source srcset={welcome} type="image/webp" />
 				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
+			</picture> -->
+			Welcome welcome
 		</span>
-
-		to your new<br />SvelteKit app
 	</h1>
 
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
+	<p>
+		The <a href="/sverdle">Sverdle</a> page illustrates SvelteKit's data loading and form handling. Try
+		using it with JavaScript disabled!
+	</p>
+	<h2>Hohohohohohohoho</h2>
+	<p>Heeheeheheheheehheheheheh</p>
 	<Counter />
 </section>
 
@@ -41,7 +42,7 @@
 		width: 100%;
 	}
 
-	.welcome {
+	/* .welcome {
 		display: block;
 		position: relative;
 		width: 100%;
@@ -55,5 +56,5 @@
 		height: 100%;
 		top: 0;
 		display: block;
-	}
+	} */
 </style>
