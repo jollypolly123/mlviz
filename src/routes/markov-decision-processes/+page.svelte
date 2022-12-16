@@ -1,10 +1,11 @@
 <script lang="ts">
     import MDPGraph from "$lib/components/MDP.svelte";
     import Tags from "$lib/components/Tags.svelte";
+    import type { States, Action, Transition } from "$lib/types";
 
-    let states: string[] = [];
-    let transitions: string[] = [];
-    let actions: string[] = [];
+    let states: States = {};
+    let transitions: { [id: string]: Transition } = {};
+    let actions: { [id: string]: Action } = {};
     let rewards: string[] = [];
 </script>
 
@@ -19,10 +20,9 @@
 
     <div class="tool">
         <div class="inputs">
-            <!-- add tags https://stackoverflow.com/questions/49527155/tag-key-how-to-add-an-tag-while-pressing-enter-button -->
             <form>
                 <h4>MDP Definition</h4>
-                <Tags bind:tags={states} placeholder="States" title="Type the name of a state then press enter"/>
+                <Tags bind:tags={states} placeholder="States" title="Type the name of a state then press enter" color={true}/>
                 <input type="text" name="transitions" placeholder="Transitions" title="Type the name of a transition then select a start and end state" />
                 <!-- bind states -->
                 <input type="text" name="actions" placeholder="Actions" title="Type the name of a action then select a start and end state" />

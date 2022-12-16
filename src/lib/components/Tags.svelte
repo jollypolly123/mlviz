@@ -1,23 +1,25 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let tags: string[];
+    export let tags: { [id: string]: any };
     export let placeholder: string = "";
     export let title: string = "";
+    export let color: boolean = false;
 
     let tagInput: HTMLInputElement;
     let tagList: HTMLDivElement;
 
     const addTag = (tag: string) => {
-        if (tag) {
-            tags = [...tags, tag];
+        if (tag && !(tags.hasOwnProperty(tag))) {
+            tags[tag] = {};
+            if (color) tags[tag]["color"] = "#000000";
             tagInput.value = "";
         }
     };
 
-    const removeTag = (tag: string) => {
-        tags = tags.filter((t) => t !== tag);
-    };
+    // const removeTag = (tag: string) => {
+    //     tags = tags.filter((t) => t !== tag);
+    // };
 
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Enter") {
@@ -41,8 +43,14 @@
 <div>
     <input type="text" bind:this={tagInput} placeholder={placeholder} title={title} />
     <div bind:this={tagList} class:tagList>
-        {#each tags as tag}
-            <span class:tag>{tag}<input type="color"/></span>
+        {#each Object.keys(tags) as tag}
+            <!-- add delete and rename functionality -->
+            <span class:tag>
+                {tag}
+                {#if color}
+                <input type="color"/>
+                {/if}
+            </span>
         {/each}
     </div>
 </div>

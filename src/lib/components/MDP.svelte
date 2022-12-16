@@ -1,8 +1,9 @@
 <script lang="ts">
 	import cytoscape from "cytoscape";
     import { randInt } from "$lib/utils";
+    import type { States } from "$lib/types";
 
-    export let states: string[];
+    export let states: States;
 
     let graphDiv: HTMLDivElement;
     let cy: cytoscape.Core;
@@ -11,14 +12,43 @@
         cy = cytoscape({
             container: container,
             elements: [],
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'label': 'data(id)',
+                        'text-valign': 'top',
+                        'shape': 'ellipse',
+                        'font-size': 12,
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 3,
+                        'line-color': '#ccc',
+                        'target-arrow-color': '#ccc',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier'
+                    }
+                }
+            ]
         });
 	}
 
-    const addNodes = (cy: cytoscape.Core, states: string[]) => {
-        cy.add(states.map((state) => ({ 
+    const addNodes = (cy: cytoscape.Core, states: States) => {
+        const nodeIDs = cy.nodes().reduce((acc, node) => {
+            (acc as { [ id: string ]: string})[node.id()] = "";
+            return acc;
+        }, {});
+        const newNodes = Object.keys(states).filter((stateID) => !(stateID in nodeIDs));
+        cy.add(newNodes.map((stateID) => ({ 
             group: 'nodes', 
-            data: { id: state },
-            position: { x: randInt(10, cy.width()-10), y: randInt(10, cy.height()-10) }
+            data: { id: stateID },
+            position: { x: randInt(10, cy.width()-10), y: randInt(10, cy.height()-10) },
+            style: {
+                'background-color': states[stateID].color,
+            }
         })));
     }
 
