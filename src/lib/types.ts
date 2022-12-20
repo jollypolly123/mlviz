@@ -9,6 +9,11 @@ type States = {
 
 type Action = {
     name: string;
+    color: string;
+}
+
+type Actions = {
+    [id: string]: Action;
 }
 
 type Transition = {
@@ -16,6 +21,11 @@ type Transition = {
     startState: State;
     endState: State;
     probability: number;
+    reward: number;
 }
 
-export type { State, States, Action, Transition }
+type Transitions = {
+    [id: string]: Transition;
+}
+
+export type { State, States, Action, Actions, Transition, Transitions }

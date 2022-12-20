@@ -17,9 +17,13 @@
         }
     };
 
-    // const removeTag = (tag: string) => {
-    //     tags = tags.filter((t) => t !== tag);
-    // };
+    const removeTag = (tag: string) => {
+        for (const t of Object.keys(tags)) {
+            if (t === tag) {
+                delete tags[t];
+            }
+        }
+    };
 
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Enter") {
@@ -29,9 +33,17 @@
 
     const handleTagClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        // if (target.tagName === "DIV") {
-        //     removeTag(target.innerText);
-        // }
+        // open modal to edit or delete tag
+
+        // removeTag(target.innerText.trim());
+    };
+
+    const handleColorChange = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const color = target.value;
+        const tag = target.parentElement!.innerText.trim();
+        tags[tag]["color"] = color;
+        console.log(tag, color);
     };
 
     onMount(() => {
@@ -44,11 +56,10 @@
     <input type="text" bind:this={tagInput} placeholder={placeholder} title={title} />
     <div bind:this={tagList} class:tagList>
         {#each Object.keys(tags) as tag}
-            <!-- add delete and rename functionality -->
             <span class:tag>
                 {tag}
                 {#if color}
-                <input type="color"/>
+                <input type="color" on:change={(e) => handleColorChange(e)}/>
                 {/if}
             </span>
         {/each}
@@ -67,12 +78,14 @@
         padding: 5px;
         margin: 5px;
     }
+    input[type="text"] {
+        margin: 0.1rem;
+    }
     input[type="color"] {
         height: 1.2rem;
         width: 1.2rem;
         padding: 0;
         border: none;
         background-color: transparent;
-        margin-left: 5px;
     }
 </style>

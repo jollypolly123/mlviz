@@ -22,9 +22,9 @@
 			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
 				<a href="/about">About</a>
 			</li>
-			<li aria-current={$page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
+			<!-- <li aria-current={$page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
 				<a href="/sverdle">Sverdle</a>
-			</li>
+			</li> -->
 			<li aria-current={$page.url.pathname.startsWith('/markov-decision-processes') ? 'page' : undefined}>
 				<a href="/markov-decision-processes">Markov Decision Processes</a>
 			</li>

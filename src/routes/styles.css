@@ -7,10 +7,11 @@
 	--color-bg-0: rgb(202, 216, 228);
 	--color-bg-1: hsl(209, 36%, 86%);
 	--color-bg-2: hsl(224, 44%, 95%);
-	--color-theme-1: #c419d3;
-	--color-theme-2: #361a90;
+	--color-theme-1: #ee39ff;
+	--color-theme-2: #230097;
 	--color-text: rgba(0, 0, 0, 0.7);
 	--color-text-light: rgba(0, 0, 0, 0.3);
+	--color-alert: #ff3856;
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
 	font-family: var(--font-body);
@@ -91,10 +92,15 @@ button {
 	font-family: inherit;
 }
 
-input[type='text'], input[type='password'], input[type='submit'] {
+input[type='text'], input[type='password'], input[type='submit'], input[type='button'] {
 	border: 1px solid var(--color-text-light);
 	border-radius: 3px;
 	padding: 0.5em;
+}
+
+.alarm {
+	color: white;
+	background-color: var(--color-alert);
 }
 
 button:focus:not(:focus-visible) {

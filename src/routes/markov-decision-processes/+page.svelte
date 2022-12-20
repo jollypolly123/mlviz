@@ -1,12 +1,34 @@
 <script lang="ts">
     import MDPGraph from "$lib/components/MDP.svelte";
     import Tags from "$lib/components/Tags.svelte";
-    import type { States, Action, Transition } from "$lib/types";
+    import { MDP } from "./mdp";
+    import type { States, Actions, Transitions } from "$lib/types";
 
     let states: States = {};
-    let transitions: { [id: string]: Transition } = {};
-    let actions: { [id: string]: Action } = {};
-    let rewards: string[] = [];
+    let transitions: Transitions = {};
+    let actions: Actions = {};
+    let mdp: MDP;
+    
+	// export let data: PageData;
+
+    function updateGraph(
+        category: "states" | "actions" | "transitions",
+        input: States | Actions | Transitions,
+    ) {
+        if (!mdp) mdp = new MDP({s: states, a: actions, t: transitions});
+        mdp.update(category, input);
+    }
+
+    function clearGraph() {
+        states = {};
+        transitions = {};
+        actions = {};
+        mdp.clear();
+    }
+
+    $: updateGraph("states", states);
+    $: updateGraph("actions", actions);
+    $: updateGraph("transitions", transitions);
 </script>
 
 <svelte:head>
@@ -23,12 +45,9 @@
             <form>
                 <h4>MDP Definition</h4>
                 <Tags bind:tags={states} placeholder="States" title="Type the name of a state then press enter" color={true}/>
+                <Tags bind:tags={actions} placeholder="Actions" title="Type the name of a action then press enter" color={true}/>
                 <input type="text" name="transitions" placeholder="Transitions" title="Type the name of a transition then select a start and end state" />
-                <!-- bind states -->
-                <input type="text" name="actions" placeholder="Actions" title="Type the name of a action then select a start and end state" />
-                <!-- bind states -->
-                <input type="text" name="rewards" placeholder="Rewards" title="Select an action and assign a reward"/>
-                <!-- bind states -->
+                <!-- bind transitions -->
                 <h5><i>Automatically generates your graph!</i></h5>
             </form>
         </div>
@@ -44,8 +63,12 @@
             </form>
         </div>
         <div class="viz">
-            <h3>MDP Graph</h3>
-            <MDPGraph bind:states={states}/>
+            <div class="graph-title">
+                <h3>MDP Graph</h3>
+                <!-- https://js.cytoscape.org/#core/export -->
+                <input type="button" class="alarm" on:click={() => clearGraph()} value="Clear" />
+            </div>
+            <MDPGraph bind:states={states} bind:actions={actions} bind:transitions={transitions}/>
         </div>
     </div>
 </div>
@@ -63,7 +86,10 @@
         width: 50%;
         margin-left: 5rem;
     }
-    input {
-        margin: 0.2rem;
+    .graph-title {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>
