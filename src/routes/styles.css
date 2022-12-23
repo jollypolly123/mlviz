@@ -105,6 +105,11 @@ input[type='text'], input[type='password'], input[type='submit'], input[type='bu
 	background-color: var(--color-alert);
 }
 
+.info {
+	color: white;
+	background-color: var(--color-theme-2);
+}
+
 button:focus:not(:focus-visible) {
 	outline: none;
 }

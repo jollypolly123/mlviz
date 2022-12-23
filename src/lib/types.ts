@@ -21,11 +21,20 @@ type Transition = {
     startState: State;
     endState: State;
     probability: number;
-    reward: number;
 }
 
 type Transitions = {
     [id: string]: Transition;
 }
 
-export type { State, States, Action, Actions, Transition, Transitions }
+type Reward = {
+    state: State;
+    action: Action;
+    value: number;
+}
+
+type Rewards = {
+    [id: string]: Reward;
+}
+
+export type { State, States, Action, Actions, Transition, Transitions, Reward, Rewards };

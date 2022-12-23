@@ -2,25 +2,33 @@
     import MDPGraph from "$lib/components/MDP.svelte";
     import Tags from "$lib/components/Tags.svelte";
     import Modal, { getModal } from "$lib/components/Modal.svelte";
-    import type { States, Actions, Transitions } from "$lib/types";
+    import type { States, Actions, Transitions, Rewards } from "$lib/types";
     import { MDP } from "./mdp";
+    
+	const container = true;
+    const hyperparameter = true;
+    const hyperparamLabel = true;
+    const transition = true;
+	// export let data: PageData;
+
+    const actionPlaceholder = "Action";
+    const startStatePlaceholder = "Start State";
+    const endStatePlaceholder = "End State";
 
     let states: States = {};
-    let transitions: Transitions = {};
     let actions: Actions = {};
+    let rewards: Rewards = {};
+    let transitions: Transitions = {};
     let mdp: MDP;
 
     let modalTitle: string = "";
     let modalContent: string = "";
 
-    let selectedAction: string = "-Action-";
-    let selectedStartState: string = "-Start-";
-    let selectedEndState: string = "-End-";
-    
-	const container = true;
-    const hyperparameter = true;
-    const hyperparamLabel = true;
-	// export let data: PageData;
+    let selectedAction: string = actionPlaceholder;
+    let selectedStartState: string = startStatePlaceholder;
+    let selectedEndState: string = endStatePlaceholder;
+    let probability: number = 1;
+    let reward: number = 0;
 
     function updateGraph(
         category: "states" | "actions" | "transitions",
@@ -38,7 +46,7 @@
     }
 
     function addTransition() {
-        if (selectedAction === "-Action-" || selectedStartState === "-Start-" || selectedEndState === "-End-") {
+        if (selectedAction === actionPlaceholder || selectedStartState === startStatePlaceholder || selectedEndState === endStatePlaceholder) {
             openInfoModal("Invalid Transition", "Please select an action, start state, and end state.");
             return;
         } else {
@@ -51,8 +59,7 @@
                     startState: states[selectedStartState],
                     action: actions[selectedAction],
                     endState: states[selectedEndState],
-                    probability: 1,
-                    reward: 0
+                    probability: probability
                 };
             }
         }
@@ -85,41 +92,81 @@
                 "MDP Definition Instructions", 
                 ("States: Type the name of a state then press enter" + 
                 "Actions: Type the name of an action then press enter" + 
-                "Transitions: Select an action, then the start state and end state"))}>MDP Definition</h4>
+                "Transitions: Select an action, then the start state and end state" + 
+                "Rewards: Select a state and action, then define reward amount"))}>MDP Definition</h4>
                 <!-- TODO: fix modal content -->
             <label for="states">States</label>
             <Tags bind:tags={states} placeholder="State label..." title="Type the name of a state then press enter" color={true}/>
             <label for="actions">Actions</label>
             <Tags bind:tags={actions} placeholder="Action label..." title="Type the name of an action then press enter" color={true}/>
-            <label for="transitions">Transitions</label>
-            <div id="create-transition">
-                <select bind:value={selectedAction}>
-                    <option value="-Action-">-Action-</option>
+            <label for="rewards">Rewards</label>
+            <div id="input-row">
+                <select class:transition bind:value={selectedAction}>
+                    <option value={actionPlaceholder}>{actionPlaceholder}</option>
                     {#each Object.keys(actions) as action}
                         <option value={action}>
                             {action}
                         </option>
                     {/each}
                 </select>
-                <select bind:value={selectedStartState}>
-                    <option value="-Start-">-Start-</option>
+                <select class:transition bind:value={selectedStartState}>
+                    <option value={startStatePlaceholder}>{startStatePlaceholder}</option>
                     {#each Object.keys(states) as state}
                         <option value={state}>
                             {state}
                         </option>
                     {/each}
                 </select>
-                <select bind:value={selectedEndState}>
-                    <option value="-End-">-End-</option>
-                    {#each Object.keys(states) as state}
-                        <option value={state}>
-                            {state}
-                        </option>
-                    {/each}
-                </select>
+                <input type="text" class:transition bind:value={reward} placeholder="Reward" title="Reward Value" />
             </div>
-            <input type="button" on:click={() => addTransition()} value="Add" />
-            <!-- TODO: also add probability and reward -->
+            <input type="button" class="info" on:click={() => addTransition()} value="Add New Reward" />
+            <table>
+                <thead>
+                    <tr>
+                        <th>State</th>
+                        <th>Action</th>
+                        <th>Reward</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each Object.values(rewards) as reward}
+                        <tr>
+                            <td>{reward.state.name}</td>
+                            <td>{reward.action.name}</td>
+                            <td>{reward.value}</td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+            <label for="transitions">Transitions</label>
+            <div id="input-row">
+                <select class:transition bind:value={selectedAction}>
+                    <option value={actionPlaceholder}>{actionPlaceholder}</option>
+                    {#each Object.keys(actions) as action}
+                        <option value={action}>
+                            {action}
+                        </option>
+                    {/each}
+                </select>
+                <select class:transition bind:value={selectedStartState}>
+                    <option value={startStatePlaceholder}>{startStatePlaceholder}</option>
+                    {#each Object.keys(states) as state}
+                        <option value={state}>
+                            {state}
+                        </option>
+                    {/each}
+                </select>
+                <select class:transition bind:value={selectedEndState}>
+                    <option value={endStatePlaceholder}>{endStatePlaceholder}</option>
+                    {#each Object.keys(states) as state}
+                        <option value={state}>
+                            {state}
+                        </option>
+                    {/each}
+                </select>
+                <input type="text" class:transition bind:value={probability} placeholder="Probability" title="Probability" />
+            </div>
+            <input type="button" class="info" on:click={() => addTransition()} value="Add New Transition" />
             <table>
                 <thead>
                     <tr>
@@ -127,7 +174,6 @@
                         <th>Action</th>
                         <th>End State</th>
                         <th>Probability</th>
-                        <th>Reward</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -137,7 +183,6 @@
                             <td>{transition.action.name}</td>
                             <td>{transition.endState.name}</td>
                             <td>{transition.probability}</td>
-                            <td>{transition.reward}</td>
                         </tr>
                     {/each}
                 </tbody>
@@ -189,7 +234,7 @@
 </div>
 
 <Modal>
-	<h1>{modalTitle}</h1>
+	<h3>{modalTitle}</h3>
     {modalContent}
 </Modal>
 
@@ -200,15 +245,16 @@
     label {
         margin-top: .2rem;
     }
-    select {
-        margin: .2rem;
-        height: 36px;
-    }
-    #create-transition {
+    #input-row {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+    }
+    .transition {
+        margin: .2rem;
+        height: 36px;
+        width: 30%;
     }
     .inputs {
         display: flex;
