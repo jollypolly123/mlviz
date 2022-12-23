@@ -9,7 +9,7 @@
 </script>
 
 <script lang="ts">
-    import { onDestroy } from 'svelte'
+    import { onMount } from 'svelte'
         
     let topDiv: HTMLDivElement
     let visible = false
@@ -51,11 +51,13 @@
         
     //expose the API
     modals[id]={open,close}
-        
-    onDestroy(()=>{
-        delete modals[id]
-        window.removeEventListener("keydown",keyPress)
-    })
+    
+	onMount(()=>{
+		return () => {
+			delete modals[id]
+        	window.removeEventListener("keydown",keyPress)
+		}
+	})
 	
 </script>
 
