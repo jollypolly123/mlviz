@@ -90,12 +90,14 @@ input,
 button {
 	font-size: inherit;
 	font-family: inherit;
+	box-sizing: border-box;
 }
 
-input[type='text'], input[type='password'], input[type='submit'], input[type='button'] {
+input[type='text'], input[type='password'], input[type='submit'], input[type='button'], select {
 	border: 1px solid var(--color-text-light);
 	border-radius: 3px;
 	padding: 0.5em;
+	margin: 0.2em;
 }
 
 .alarm {
