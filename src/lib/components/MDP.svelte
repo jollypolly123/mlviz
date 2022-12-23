@@ -1,7 +1,7 @@
 <script lang="ts">
 	import cytoscape from "cytoscape";
     import { randInt } from "$lib/utils";
-    import type { States, Actions, Transitions } from "$lib/types";
+    import type { States, Actions, Transitions, Rewards } from "$lib/types";
 
     export let states: States;
     export let actions: Actions = {};
@@ -54,7 +54,20 @@
         })));
     }
 
-    const addEdges = (cy: cytoscape.Core, transitions: Transitions): void => {
+    const removeNodes = (cy: cytoscape.Core, states: States): void => {
+        // TODO: fix
+        // const nodeIDs = cy.nodes().reduce((acc, node) => {
+        //     (acc as { [ id: string ]: string})[node.id()] = "";
+        //     return acc;
+        // }, {});
+        // const removedNodes = Object.keys(nodeIDs).filter((stateID) => !(stateID in states));
+        // cy.remove(removedNodes.map((stateID) => ({ 
+        //     group: 'nodes', 
+        //     data: { id: stateID },
+        // })));
+    }
+
+    const addEdges = (cy: cytoscape.Core, transitions: Transitions, rewards: Rewards): void => {
         // TODO: fix
         const edgeIDs = cy.edges().reduce((acc, edge) => {
             (acc as { [ id: string ]: string})[edge.id()] = "";
@@ -67,9 +80,22 @@
         })));
     }
 
+    const removeEdges = (cy: cytoscape.Core, transitions: Transitions): void => {
+        // TODO: fix
+        // const nodeIDs = cy.nodes().reduce((acc, node) => {
+        //     (acc as { [ id: string ]: string})[node.id()] = "";
+        //     return acc;
+        // }, {});
+        // const removedNodes = Object.keys(nodeIDs).filter((stateID) => !(stateID in states));
+        // cy.remove(removedNodes.map((stateID) => ({ 
+        //     group: 'nodes', 
+        //     data: { id: stateID },
+        // })));
+    }
+
     const updateGraph = (
         cy: cytoscape.Core,
-        category: "states" | "actions" | "transitions",
+        category: "states" | "actions" | "transitions" | "rewards",
         input: any
     ): void => {
         if (Object.keys(input).length === 0) {
@@ -79,17 +105,32 @@
         }
 
         if (category === "states") {
-            if (cy.nodes().length !== Object.keys(input).length) {
+            if (cy.nodes().length < Object.keys(input).length) {
                 addNodes(cy, input);
+            } else if (cy.nodes().length > Object.keys(input).length) {
+                removeNodes(cy, input);
             } else {
                 cy.nodes().forEach((node) => {
+                    // TODO: fix
+                    // node.data("id", input[node.id()].name)
                     node.style("background-color", input[node.id()].color);
                 });
             }
         } else if (category === "actions") {
-
+            //  TODO: fill
         } else if (category === "transitions") {
-
+            //  TODO: fix
+            // if (cy.edges().length < Object.keys(input).length) {
+            //     addEdges(cy, input, {});
+            // } else if (cy.edges().length > Object.keys(input).length) {
+            //     removeEdges(cy, input);
+            // } else {
+            //     cy.edges().forEach((edge) => {
+            //         edge.style("line-color", input[edge.id()].color);
+            //     });
+            // }
+        } else if (category === "rewards") {
+            //  TODO: fill
         }
     }
 

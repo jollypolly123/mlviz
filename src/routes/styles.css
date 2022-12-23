@@ -110,6 +110,14 @@ input[type='text'], input[type='password'], input[type='submit'], input[type='bu
 	background-color: var(--color-theme-2);
 }
 
+.alarm-text {
+	color: var(--color-alert);
+}
+
+.info-text {
+	color: var(--color-theme-2);
+}
+
 button:focus:not(:focus-visible) {
 	outline: none;
 }

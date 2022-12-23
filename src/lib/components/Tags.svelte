@@ -4,12 +4,15 @@
     export let tags: { [id: string]: any };
     export let placeholder: string = "";
     export let title: string = "";
+    export let hover: string = "";
     export let color: boolean = false;
 
     let tagInput: HTMLInputElement;
     let tagList: HTMLDivElement;
 
-    let addTag = (tag: string) => {
+    const inputClass = true;
+
+    const addTag = (tag: string) => {
         if (tag && !(tags.hasOwnProperty(tag))) {
             tags[tag] = {name: tag};
             if (color) tags[tag]["color"] = "#000000";
@@ -31,7 +34,7 @@
         }
     };
 
-    let handleTagClick = (e: MouseEvent) => {
+    const handleTagClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         // open modal to edit or delete tag
 
@@ -52,7 +55,12 @@
     });
 </script>
 
-<input type="text" bind:this={tagInput} placeholder={placeholder} title={title} />
+<div class:inputClass>
+    {#if title}
+        <label for="tagInput">{title}</label>
+    {/if}
+    <input type="text" bind:this={tagInput} placeholder={placeholder} title={hover} />
+</div>
 <div bind:this={tagList} class:tagList>
     {#each Object.keys(tags) as tag}
         <span class:tag>
@@ -65,8 +73,11 @@
 </div>
 
 <style>
-    input[type="text"] {
-        margin: 5px;
+    .inputClass {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
     }
     input[type="color"] {
         height: 1.2rem;
@@ -86,5 +97,7 @@
         border-radius: 5px;
         padding: 5px;
         margin: 5px;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
     }
 </style>
