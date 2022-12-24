@@ -57,7 +57,7 @@
 
 <div class:inputClass>
     {#if title}
-        <label for="tagInput">{title}</label>
+        <label for="tagInput" class="title">{title}</label>
     {/if}
     <input type="text" bind:this={tagInput} placeholder={placeholder} title={hover} />
 </div>
@@ -73,6 +73,9 @@
 </div>
 
 <style>
+    .title {
+        margin-right: .5rem;
+    }
     .inputClass {
         display: flex;
         flex-direction: row;

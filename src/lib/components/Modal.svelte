@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
 	let onTop: HTMLDivElement | null   //keeping track of which open modal is on top
-	const modals: { [id: string]: any} = {};  //all modals get registered here for easy future access
+	const modals: { [id: string]: any } = {};  //all modals get registered here for easy future access
 	
 	// 	returns an object for the modal specified by `id`, which contains the API functions (`open` and `close` )
 	export function getModal(id=''){
@@ -25,7 +25,7 @@
 
     /**  API **/
     function open(callback: (//<reference types="svelte" />
-			arg0: any) => void){
+			arg0: any) => void) {
         closeCallback=callback
         if(visible) return
         prevOnTop=onTop
@@ -36,6 +36,7 @@
         document.body.style.overflow="hidden" 
 
         visible=true
+
         //Move the modal in the DOM to be the last child of <BODY> so that it can be on top of everything
         document.body.appendChild(topDiv)
     }
@@ -50,7 +51,7 @@
     }
         
     //expose the API
-    modals[id]={open,close}
+    modals[id]={ open, close }
     
 	onMount(()=>{
 		return () => {
@@ -97,6 +98,7 @@
 		background: white;
         border: 2px solid #000;
 		filter: drop-shadow(5px 5px 5px #555);
+		max-width: 90vw;
 		padding: 1em;
 	}
 

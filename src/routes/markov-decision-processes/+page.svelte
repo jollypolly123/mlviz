@@ -1,7 +1,10 @@
 <script lang="ts">
-    import MDPGraph from "$lib/components/MDP.svelte";
     import Tags from "$lib/components/Tags.svelte";
+    import MDPGraph from "$lib/components/markov-decision-processes/MDP.svelte";
+    import MDPDefinition from "$lib/components/markov-decision-processes/MDPDefinitionInstructions.svelte";
+    import TrainingHyperparameters from "$lib/components/markov-decision-processes/TrainingHyperparametersInstructions.svelte";
     import Modal, { getModal } from "$lib/components/Modal.svelte";
+    import ErrorMessage from "$lib/components/ErrorMessage.svelte";
     import type { States, Actions, Transitions, Rewards } from "$lib/types";
     import { MDP } from "./mdp";
     
@@ -10,11 +13,13 @@
     const hyperparameter = true;
     const hyperparamLabel = true;
     const transition = true;
+    const icon = true;
 	// export let data: PageData;
 
     const actionPlaceholder = "Action";
     const startStatePlaceholder = "Start State";
     const endStatePlaceholder = "End State";
+    const initStatePlaceholder = "Init State";
 
     let states: States = {};
     let actions: Actions = {};
@@ -22,8 +27,8 @@
     let transitions: Transitions = {};
     let mdp: MDP;
 
-    let modalTitle: string = "";
-    let modalContent: string = "";
+    let modalContent: any;
+    let modalProps: { [key: string]: any } = {};
     
     let rewardAction: string = actionPlaceholder;
     let rewardState: string = startStatePlaceholder;
@@ -33,6 +38,13 @@
     let transitionStartState: string = startStatePlaceholder;
     let transitionEndState: string = endStatePlaceholder;
     let probability: number = 1;
+
+    let initState: string = initStatePlaceholder;
+    let discountValue: number;
+    let learningRate: number;
+    let epsilon: number;
+    let horizon: number;
+    let maxIterations: number;
 
     function updateGraph(
         category: "states" | "actions" | "transitions" | "rewards",
@@ -49,14 +61,24 @@
         mdp.clear();
     }
 
+    function editState(id: string, name: string) {
+        // states[id].name = name;
+        // states = states;
+    }
+
+    function editAction(id: string, name: string) {
+        // actions[id].name = name;
+        // actions = actions;
+    }
+
     function addReward() {
         if (rewardAction === actionPlaceholder || rewardState === startStatePlaceholder) {
-            openInfoModal("Invalid Reward", "Please select an action and state.");
+            displayError("Invalid Reward", "Please select an action and state.");
             return;
         } else {
             const rewardId = `${rewardState}-${rewardAction}`;
             if (rewardId in rewards) {
-                openInfoModal("Invalid Reward", "This reward already exists.");
+                displayError("Invalid Reward", "This reward already exists.");
                 return;
             } else {
                 rewards[rewardId] = {
@@ -68,6 +90,11 @@
         }
     }
 
+    function editReward(id: string, value: number) {
+        // rewards[id].value = value;
+        // rewards = rewards;
+    }
+
     function deleteReward(id: string) {
         delete rewards[id];
         rewards = rewards;
@@ -75,15 +102,15 @@
 
     function addTransition() {
         if (transitionAction === actionPlaceholder || transitionStartState === startStatePlaceholder || transitionEndState === endStatePlaceholder) {
-            openInfoModal("Invalid Transition", "Please select an action, start state, and end state.");
+            displayError("Invalid Transition", "Please select an action, start state, and end state.");
             return;
         } else if (probability < 0 || probability > 1) {
-            openInfoModal("Invalid Transition", "Probability must be between 0 and 1.");
+            displayError("Invalid Transition", "Probability must be between 0 and 1.");
             return;
         } else {
             const transitionId = `${transitionStartState}-${transitionAction}-${transitionEndState}`;
             if (transitionId in transitions) {
-                openInfoModal("Invalid Transition", "This transition already exists.");
+                displayError("Invalid Transition", "This transition already exists.");
                 return;
             } else {
                 transitions[transitionId] = {
@@ -96,14 +123,47 @@
         }
     }
 
+    function editTransition(id: string, probability: number) {
+        // transitions[id].probability = probability;
+        // transitions = transitions;
+    }
+
     function deleteTransition(id: string) {
         delete transitions[id];
         transitions = transitions;
     }
 
-    function openInfoModal(title: string, content: string) {
-        modalTitle = title;
+    function calculate() {
+        if (initState === initStatePlaceholder || discountValue === undefined || learningRate === undefined || epsilon === undefined || horizon === undefined || maxIterations === undefined) {
+            displayError("Invalid Training Parameters", "Please enter valid training parameters.");
+        } else {
+            console.log("calculating!");
+            // mdp.train({
+            //     initState: states[initState],
+            //     discountValue: discountValue,
+            //     learningRate: learningRate,
+            //     epsilon: epsilon,
+            //     horizon: horizon,
+            //     maxIterations: maxIterations
+            // });
+        }
+        // let discountValue: number;
+        // let learningRate: number;
+        // let epsilon: number;
+        // let horizon: number;
+        // let maxIterations: number;
+    }
+
+    function displayError(title: string, content: string) {
+        alert(title + ": " + content);
+        // modalContent = ErrorMessage;
+        // modalProps = {title: title, content: content};
+        // getModal().open();
+    }
+
+    function openInfoModal(content: any) {
         modalContent = content;
+        modalProps = {};
         getModal().open();
     }
 
@@ -119,17 +179,15 @@
 
 <div class:container>
     <h1>Markov Decision Process Visualization</h1>
-    <p>Visualize Markov Decision Processes (MDPs) and calculate their value functions.</p>
+    <p>Visualize Markov Decision Processes (MDPs) and calculate their value functions. This is meant to be a supplementary tool to interact with MDPs. If you don't know what a MDP is, I suggest checking out <a href="https://rojagtap.medium.com/understanding-the-markov-decision-process-mdp-8f838510f150">this article</a> then coming back!</p>
 
     <div class="tool">
         <div class="inputs">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <h4 on:click={() => openInfoModal(
-                "MDP Definition Instructions", 
-                ("States: Type the name of a state then press enter" + 
-                "Actions: Type the name of an action then press enter" + 
-                "Transitions: Select an action, then the start state and end state" + 
-                "Rewards: Select a state and action, then define reward amount"))}>MDP Definition</h4>
+            <h4 on:click={() => openInfoModal(MDPDefinition)}>
+                <span class:icon>&#9432;</span>
+                MDP Definition
+            </h4>
                 <!-- TODO: fix modal content -->
             <Tags bind:tags={states} title="States" placeholder="Enter state labels..." hover="Type the name of a state then press enter" color={true}/>
             <Tags bind:tags={actions} title="Actions" placeholder="Enter action labels..." hover="Type the name of an action then press enter" color={true}/>
@@ -154,7 +212,7 @@
                         </option>
                     {/each}
                 </select>
-                <input type="text" class:transition bind:value={reward} placeholder="Reward" title="Reward Value" />
+                <input type="text" class:transition bind:value={reward} placeholder="Value" title="Reward Value" />
             </div>
             <table>
                 <thead>
@@ -162,7 +220,7 @@
                         <th>State</th>
                         <th>Action</th>
                         <th>Reward</th>
-                        <th></th>
+                        <th>&#9881;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -221,7 +279,7 @@
                         <th>Action</th>
                         <th>End</th>
                         <th>Prob.</th>
-                        <th></th>
+                        <th>&#9881;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -246,8 +304,21 @@
             <h5><i>Automatically generates your graph!</i></h5>
         </div>
         <div class="inputs">
-            <h4>Training Hyperparameters</h4>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <h4 on:click={() => openInfoModal(TrainingHyperparameters)}>
+                <span class:icon>&#9432;</span>
+                Training Hyperparameters
+            </h4>
             <div class="hyperparameters">
+                <label class:hyperparamLabel for="initState">Initial State</label>
+                <select class:hyperparameter bind:value={initState}>
+                    <option value={initStatePlaceholder}>{initStatePlaceholder}</option>
+                    {#each Object.keys(states) as state}
+                        <option value={state}>
+                            {state}
+                        </option>
+                    {/each}
+                </select>
                 <label class:hyperparamLabel for="discount">Discount value (γ)</label>
                 <input type="text" name="discount" class:hyperparameter placeholder="0.0 to 1.0" />
                 <label class:hyperparamLabel for="learning">Learning rate (α)</label>
@@ -260,7 +331,7 @@
                 <input type="text" name="iterations" class:hyperparameter placeholder="0, 1, 2, ..." />
             </div>
             <div class="buttons">
-                <input disabled type="submit" on:click={() => console.log("Calculate something")} value="Calculate" title="Coming Soon!" />
+                <input disabled type="submit" on:click={() => calculate()} value="Calculate" title="Coming Soon!" />
                 <input disabled type="submit" on:click={() => console.log("Run Simulation")} value="Run Simulation" title="Coming Soon!" />
             </div>
         </div>
@@ -276,8 +347,7 @@
 </div>
 
 <Modal>
-	<h3>{modalTitle}</h3>
-    {modalContent}
+    <svelte:component this={modalContent} {...modalProps}/>
 </Modal>
 
 <style>
@@ -297,6 +367,9 @@
         text-align: center;
         overflow-x: hidden;
         overflow-wrap: break-word;
+    }
+    .icon {
+        cursor: pointer;
     }
     .inputRow {
         display: flex;
