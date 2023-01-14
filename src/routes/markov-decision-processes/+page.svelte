@@ -6,7 +6,6 @@
     import EditTransition from "$lib/components/markov-decision-processes/EditTransition.svelte";
     import TrainingHyperparameters from "$lib/components/markov-decision-processes/TrainingHyperparametersInstructions.svelte";
     import Modal, { getModal } from "$lib/components/Modal.svelte";
-    import ErrorMessage from "$lib/components/ErrorMessage.svelte";
     import type { States, Actions, Transitions, Rewards } from "$lib/types";
     import { MDP } from "./mdp";
     
@@ -131,7 +130,6 @@
             displayError("Invalid Transition", "Probability must be between 0 and 1.");
             return;
         }
-        console.log(id, probability);
         transitions[id].probability = probability;
         transitions = transitions;
         getModal().close();
@@ -165,9 +163,6 @@
 
     function displayError(title: string, content: string) {
         alert(title + ": " + content);
-        // modalContent = ErrorMessage;
-        // modalProps = {title: title, content: content};
-        // getModal().open();
     }
 
     function openInfoModal(content: any) {
@@ -246,8 +241,7 @@
                             <td>{reward.value}</td>
                             <td>
                                 <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                <div class="edit" on:click={() => openEditModal(EditReward, {})}>&#9998;</div>
-                                    <!-- TODO: editReward but open modal first ugghhh -->
+                                <div class="edit" on:click={() => openEditModal(EditReward, {rewards: rewards, rewardID: `${reward.state.name}-${reward.action.name}`, editReward: editReward})}>&#9998;</div>
                                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                                 <div class="delete" on:click={() => deleteReward(
                                     `${reward.state.name}-${reward.action.name}`

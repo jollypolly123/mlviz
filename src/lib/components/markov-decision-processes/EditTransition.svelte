@@ -28,7 +28,6 @@
             <hr/>
             <strong class="label text">Probability:</strong> 
             <input type="text" bind:value={probability} placeholder="Probability" title="Probability" />
-            <br/>
         </div>
     {:else}
         <strong>Transition not found.</strong> Please try again.<br/>
