@@ -46,7 +46,6 @@
         const color = target.value;
         const tag = target.parentElement!.innerText.trim();
         tags[tag]["color"] = color;
-        console.log(tag, color);
     };
 
     onMount(() => {

@@ -341,7 +341,7 @@
                 <!-- TODO: https://js.cytoscape.org/#core/export -->
                 <input type="button" class="alarm" on:click={() => clearGraph()} value="Clear" />
             </div>
-            <MDPGraph bind:states={states} bind:actions={actions} bind:transitions={transitions}/>
+            <MDPGraph bind:states={states} bind:actions={actions} bind:transitions={transitions} bind:rewards={rewards}/>
         </div>
     </div>
 </div>

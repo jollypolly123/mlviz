@@ -6,6 +6,7 @@
     export let states: States;
     export let actions: Actions = {};
     export let transitions: Transitions = {};
+    export let rewards: Rewards = {};
 
     let graphDiv: HTMLDivElement;
     let cy: cytoscape.Core;
@@ -27,13 +28,13 @@
                 {
                     selector: 'edge',
                     style: {
+                        'label': 'data(probability)',
                         'width': 3,
-                        'line-color': '#ccc',
-                        'target-arrow-color': '#ccc',
                         'target-arrow-shape': 'triangle',
-                        'curve-style': 'bezier'
+                        'curve-style': 'bezier',
+                        'text-margin-y': -15,
                     }
-                }
+                },
             ]
         });
 	}
@@ -55,42 +56,78 @@
     }
 
     const removeNodes = (cy: cytoscape.Core, states: States): void => {
-        // TODO: fix
-        // const nodeIDs = cy.nodes().reduce((acc, node) => {
-        //     (acc as { [ id: string ]: string})[node.id()] = "";
-        //     return acc;
-        // }, {});
-        // const removedNodes = Object.keys(nodeIDs).filter((stateID) => !(stateID in states));
-        // cy.remove(removedNodes.map((stateID) => ({ 
-        //     group: 'nodes', 
-        //     data: { id: stateID },
-        // })));
+        const nodeIDs = cy.nodes().reduce((acc, node) => {
+            (acc as { [ id: string ]: string})[node.id()] = "";
+            return acc;
+        }, {});
+        const removedNodes = Object.keys(nodeIDs).filter((stateID) => !(stateID in states));
+        removedNodes.forEach(nodeID => {
+            cy.remove(`node[id="${nodeID}"]`);
+        });
     }
 
-    const addEdges = (cy: cytoscape.Core, transitions: Transitions, rewards: Rewards): void => {
-        // TODO: fix
+    const editNodes = (cy: cytoscape.Core, states: States): void => {
+        // TODO: verify/update/fix
+        cy.nodes().forEach((node) => {
+            node.style("background-color", states[node.id()].color);
+        });
+    }
+
+    const addEdges = (cy: cytoscape.Core, transitions: Transitions, actions: Actions, rewards: Rewards): void => {
         const edgeIDs = cy.edges().reduce((acc, edge) => {
             (acc as { [ id: string ]: string})[edge.id()] = "";
             return acc;
         }, {});
         const newEdges = Object.keys(transitions).filter((transitionID) => !(transitionID in edgeIDs));
-        cy.add(newEdges.map((transitionID) => ({ 
-            group: 'edges', 
-            data: { id: transitionID, source: transitions[transitionID].startState, target: transitions[transitionID].endState },
-        })));
+        cy.add(newEdges.map((transitionID) => {
+            var source = transitions[transitionID].startState.name;
+            var target = transitions[transitionID].endState.name;
+            var action = transitions[transitionID].action.name;
+            var rewardName = `${source}-${action}`;
+            var rewardVal = rewardName in rewards ? rewards[rewardName].value : 0;
+            var probability = transitions[transitionID].probability;
+            var color = actions[action].color;
+            return { 
+                group: 'edges', 
+                data: { 
+                    id: transitionID, 
+                    source: source, 
+                    target: target,
+                    reward: rewardVal,
+                    action: action,
+                    probability: probability,
+                },
+                style: {
+                    'line-color': color,
+                    'target-arrow-color': color,
+                }
+            }
+        }));
     }
 
     const removeEdges = (cy: cytoscape.Core, transitions: Transitions): void => {
-        // TODO: fix
-        // const nodeIDs = cy.nodes().reduce((acc, node) => {
-        //     (acc as { [ id: string ]: string})[node.id()] = "";
-        //     return acc;
-        // }, {});
-        // const removedNodes = Object.keys(nodeIDs).filter((stateID) => !(stateID in states));
-        // cy.remove(removedNodes.map((stateID) => ({ 
-        //     group: 'nodes', 
-        //     data: { id: stateID },
-        // })));
+        const edgeIDs = cy.edges().reduce((acc, edge) => {
+            (acc as { [ id: string ]: string})[edge.id()] = "";
+            return acc;
+        }, {});
+        const removedEdges = Object.keys(edgeIDs).filter((transitionID) => !(transitionID in transitions));
+        removedEdges.forEach(edgeID => {
+            cy.remove(`edge[id="${edgeID}"]`);
+        });
+    }
+
+    const editEdges = (cy: cytoscape.Core, transitions: Transitions, actions: Actions, rewards: Rewards): void => {
+        cy.edges().forEach((edge) => {
+            var rewardName = `${edge.data('source')}-${edge.data('action')}`;
+            var rewardVal = rewardName in rewards ? rewards[rewardName].value : 0;
+            var probability = transitions[edge.id()].probability;
+            var color = actions[edge.data('action')].color;
+            edge.data('reward', rewardVal);
+            edge.data('probability', probability);
+            edge.style('line-color', color);
+            edge.style('target-arrow-color', color);
+            edge.style('label', `${probability}`);
+        });
     }
 
     const updateGraph = (
@@ -100,37 +137,30 @@
     ): void => {
         if (Object.keys(input).length === 0) {
             if (category === "states") cy.remove(cy.nodes());
-            else cy.remove(cy.edges());
+            else if (category === "actions" || category === "transitions") cy.remove(cy.edges());
             return;
         }
 
         if (category === "states") {
-            if (cy.nodes().length < Object.keys(input).length) {
-                addNodes(cy, input);
-            } else if (cy.nodes().length > Object.keys(input).length) {
-                removeNodes(cy, input);
+            if (cy.nodes().length < Object.keys(states).length) {
+                addNodes(cy, states);
+            } else if (cy.nodes().length > Object.keys(states).length) {
+                removeNodes(cy, states);
             } else {
-                cy.nodes().forEach((node) => {
-                    // TODO: fix
-                    // node.data("id", input[node.id()].name)
-                    node.style("background-color", input[node.id()].color);
-                });
+                editNodes(cy, states);
             }
         } else if (category === "actions") {
-            //  TODO: fill
+            editEdges(cy, transitions, actions, rewards);
         } else if (category === "transitions") {
-            //  TODO: fix
-            // if (cy.edges().length < Object.keys(input).length) {
-            //     addEdges(cy, input, {});
-            // } else if (cy.edges().length > Object.keys(input).length) {
-            //     removeEdges(cy, input);
-            // } else {
-            //     cy.edges().forEach((edge) => {
-            //         edge.style("line-color", input[edge.id()].color);
-            //     });
-            // }
+            if (cy.edges().length < Object.keys(transitions).length) {
+                addEdges(cy, transitions, actions, rewards);
+            } else if (cy.edges().length > Object.keys(transitions).length) {
+                removeEdges(cy, transitions);
+            } else {
+                editEdges(cy, transitions, actions, rewards);
+            }
         } else if (category === "rewards") {
-            //  TODO: fill
+            editEdges(cy, transitions, actions, rewards);
         }
     }
 
@@ -138,6 +168,7 @@
     $: updateGraph(cy, "states", states);
     $: updateGraph(cy, "actions", actions);
     $: updateGraph(cy, "transitions", transitions);
+    $: updateGraph(cy, "rewards", rewards);
 
 	const container = true;
 </script>
