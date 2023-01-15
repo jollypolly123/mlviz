@@ -1,6 +1,6 @@
 <script lang="ts">
     import Tags from "$lib/components/Tags.svelte";
-    import MDPGraph from "$lib/components/markov-decision-processes/MDP.svelte";
+    import MDPGraph, { loadGraph, saveGraph, saveImg } from "$lib/components/markov-decision-processes/MDP.svelte";
     import MDPDefinition from "$lib/components/markov-decision-processes/MDPDefinitionInstructions.svelte";
     import EditReward from "$lib/components/markov-decision-processes/EditReward.svelte";
     import EditTransition from "$lib/components/markov-decision-processes/EditTransition.svelte";
@@ -329,6 +329,15 @@
                         </option>
                     {/each}
                 </select>
+                <label class:hyperparamLabel for="policies">Policies</label>
+                <!-- <select class:hyperparameter bind:value={initState}>
+                    <option value={initStatePlaceholder}>{initStatePlaceholder}</option>
+                    {#each Object.keys(states) as state}
+                        <option value={state}>
+                            {state}
+                        </option>
+                    {/each}
+                </select> -->
                 <label class:hyperparamLabel for="discount">Discount value (γ)</label>
                 <input type="text" name="discount" class:hyperparameter placeholder="0.0 to 1.0" />
                 <label class:hyperparamLabel for="learning">Learning rate (α)</label>
@@ -348,7 +357,10 @@
         <div class="viz">
             <div class="graph-title">
                 <h3>MDP Graph</h3>
-                <!-- TODO: https://js.cytoscape.org/#core/export -->
+                <!-- https://developer.chrome.com/articles/file-system-access/ -->
+                <input type="button" class="info" on:click={() => loadGraph()} value="&#128228;" />
+                <input type="button" class="info" on:click={() => saveGraph()} value="&#128229;" />
+                <input type="button" class="info" on:click={() => saveImg()} value="&#129518;" />
                 <input type="button" class="alarm" on:click={() => clearGraph()} value="Clear" />
             </div>
             <MDPGraph bind:states={states} bind:actions={actions} bind:transitions={transitions} bind:rewards={rewards}/>

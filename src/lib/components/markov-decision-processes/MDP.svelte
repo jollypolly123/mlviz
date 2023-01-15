@@ -1,3 +1,48 @@
+<script context="module" lang="ts">
+    let cy: cytoscape.Core;
+
+    export function loadGraph(){
+        var element = document.createElement("input");
+        element.type = "file";
+        element.onchange = function(event) {
+            var file = (event.target as HTMLInputElement).files![0];
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var data = JSON.parse((event.target as FileReader).result as string);
+                // TODO: update states, actions, transitions, rewards etc ugh
+                cy.json(data);
+            };
+            reader.readAsText(file);
+        };
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+	export function saveGraph(){
+        var data = JSON.stringify(cy.json());
+        var blob = new Blob( [ data ], {
+            type: 'application/json'
+        });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "MDP-download.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+	}
+
+    export function saveImg(){
+        var pic = cy.png({full: true});
+        var link = document.createElement('a');
+        link.href = pic;
+        link.download = 'MDP-download.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
 <script lang="ts">
 	import cytoscape from "cytoscape";
     import { randInt } from "$lib/utils";
@@ -9,7 +54,6 @@
     export let rewards: Rewards = {};
 
     let graphDiv: HTMLDivElement;
-    let cy: cytoscape.Core;
   
 	const init = (container: HTMLElement): void => {
         cy = cytoscape({
@@ -20,9 +64,10 @@
                     selector: 'node',
                     style: {
                         'label': 'data(id)',
-                        'text-valign': 'top',
                         'shape': 'ellipse',
-                        'font-size': 12,
+                        'text-background-color': '#fff',
+                        'text-background-opacity': 0.9,
+                        'text-background-shape': 'roundrectangle',
                     }
                 },
                 {
@@ -32,7 +77,9 @@
                         'width': 3,
                         'target-arrow-shape': 'triangle',
                         'curve-style': 'bezier',
-                        'text-margin-y': -15,
+                        'text-background-color': '#fff',
+                        'text-background-opacity': 1,
+                        'text-background-shape': 'roundrectangle',
                     }
                 },
             ]
