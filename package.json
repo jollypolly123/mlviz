@@ -17,7 +17,7 @@
 		"@neoconfetti/svelte": "^1.0.0",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^1.0.0",
-		"@sveltejs/adapter-vercel": "^1.0.0",
+		"@sveltejs/adapter-vercel": "next",
 		"@sveltejs/kit": "^1.0.0",
 		"@types/cookie": "^0.5.1",
 		"@types/cytoscape": "^3.19.9",
@@ -37,7 +37,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@sveltejs/adapter-vercel": "^1.0.3",
 		"cytoscape": "^3.23.0"
 	}
 }
