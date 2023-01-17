@@ -7,7 +7,7 @@
 	<h1>About MLViz</h1>
 	
 	<p>
-		I took 6.3900 (6.036) <strong>Introduction to Machine Learning</strong> at MIT in the Fall of 2022. This is a collection of tools I made for fun to help practice the concepts we learned in class. The topics we covered were (in order):
+		I took 6.3900 (6.036) <strong>Introduction to Machine Learning</strong> at MIT in the Fall of 2022. This is a collection of tools I made for fun to help practice the concepts we learned in class (<a href="https://introml.mit.edu/_static/fall22/LectureNotes/6_390_lecture_notes_fall2022.pdf">full notes here</a>). The topics we covered were (in order):
 	</p>
 
 	<ol>

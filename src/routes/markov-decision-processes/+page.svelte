@@ -35,19 +35,17 @@
     
     let rewardAction: string = actionPlaceholder;
     let rewardState: string = startStatePlaceholder;
-    let reward: number = 0;
+    let reward: string = "0";
 
     let transitionAction: string = actionPlaceholder;
     let transitionStartState: string = startStatePlaceholder;
     let transitionEndState: string = endStatePlaceholder;
-    let probability: number = 1;
+    let probability: string = "1";
 
     let initState: string = initStatePlaceholder;
-    let discountValue: number;
-    let learningRate: number;
-    let epsilon: number;
-    let horizon: number;
-    let maxIterations: number;
+    let discountValue: string;
+    let epsilon: string;
+    let horizon: string;
     
     let results: HTMLDivElement;
 
@@ -81,7 +79,7 @@
                 rewards[rewardId] = {
                     state: states[rewardState],
                     action: actions[rewardAction],
-                    value: reward
+                    value: parseFloat(reward)
                 };
             }
         }
@@ -102,7 +100,7 @@
         if (transitionAction === actionPlaceholder || transitionStartState === startStatePlaceholder || transitionEndState === endStatePlaceholder) {
             displayError("Invalid Transition", "Please select an action, start state, and end state.");
             return;
-        } else if (probability < 0 || probability > 1) {
+        } else if (parseFloat(probability) < 0 || parseFloat(probability) > 1) {
             displayError("Invalid Transition", "Probability must be between 0 and 1.");
             return;
         } else {
@@ -115,7 +113,7 @@
                     startState: states[transitionStartState],
                     action: actions[transitionAction],
                     endState: states[transitionEndState],
-                    probability: probability
+                    probability: parseFloat(probability)
                 };
             }
         }
@@ -150,7 +148,9 @@
         var policyStates = policies[0].map(rule => {
             return rule.state.name;
         });
-        var newState = states[Object.keys(states).filter((stateID) => !policyStates.includes(stateID))[0]];
+        var newStates = Object.keys(states).filter((stateID) => !policyStates.includes(stateID));
+        if (newStates.length === 0) return;
+        var newState = states[newStates[0]];
         policies = policies.map(policy => {
             return [...policy, {
                 state: newState,
@@ -159,34 +159,72 @@
         });
     }
 
-    function calculate() {
+    function train() {
+        
+    }
+
+    function validateInputs(): boolean {
         var errorMsg = "";
         if (initState === initStatePlaceholder) errorMsg += "\nInitial State is unset. Please choose a state from the dropdown.";
         if (discountValue === undefined) errorMsg += "\nDiscount Value is unset. Please enter a value between 0.0 and 1.0.";
-        if (learningRate === undefined) errorMsg += "\nLearning Rate is unset. Please enter a value between 0.0 and 1.0.";
+        if (parseFloat(discountValue) < 0 || parseFloat(discountValue) > 1) errorMsg += "\nDiscount Value must be between 0.0 and 1.0.";
         if (epsilon === undefined) errorMsg += "\nEpsilon is unset. Please enter a value between 0.0 and 1.0.";
-        if (horizon === undefined) errorMsg += "\nHorizon is unset. Please enter an integer value.";
-        if (maxIterations === undefined) errorMsg += "\nMax Iterations is unset. Please enter an integer value.";
+        if (parseFloat(epsilon) < 0 || parseFloat(epsilon) > 1) errorMsg += "\nEpsilon must be between 0.0 and 1.0.";
+        if (horizon === undefined) errorMsg += "\nHorizon is unset. Please enter an integer value. A value of -1 will assume infinite horizon.";
+        if (horizon !== undefined && parseFloat(horizon) < -1 || !Number.isInteger(parseFloat(horizon))) errorMsg += "\nHorizon must be an integer greater than or equal to -1.";
         if (policies.length === 0) errorMsg += "\nNo policies have been added. Please add at least one policy.";
-
         if (errorMsg !== "") {
-            displayError("Invalid Training Parameters", errorMsg);
-        } else {
-            console.log("calculating!");
-            for (let policy of policies) {
-                for (let i=0; i<maxIterations; i++) {
-                    // mdp.train({
-                    //     initState: states[initState],
-                    //     discountValue: discountValue,
-                    //     learningRate: learningRate,
-                    //     epsilon: epsilon,
-                    //     horizon: horizon,
-                    //     maxIterations: 1,
-                    //     policy: policy
-                    // });
-                }
+            displayError("Invalid Inputs", errorMsg);
+            return false;
+        }
+        return true;
+    }
+
+    function calculate() {
+        if (!validateInputs()) return;
+        let qOld: { [id: string]: number } = {};
+        for (let state of Object.keys(states)) {
+            for (let action of Object.keys(actions)) {
+                const stateAction = `${state}-${action}`;
+                qOld[stateAction] = 0;
             }
         }
+        // for (let policy of policies) {
+        // }
+        if (parseInt(horizon) === -1) {
+            // infinite horizon
+            while (true) {
+                let qNew: { [id: string]: number } = {};
+                for (let state of Object.keys(states)) {
+                    for (let action of Object.keys(actions)) {
+                        const stateAction = `${state}-${action}`;
+                        let maxNextStepReward = 0;
+                        for (const transition of Object.values(transitions)) {
+                            if (transition.startState.name === state && transition.action.name === action) {
+                                maxNextStepReward += transition.probability * Math.max(...Object.values(qOld).filter((value, index) => {
+                                    return Object.keys(qOld)[index].split("-")[0] == transition.endState.name;
+                                }));
+                            }
+                        }
+                        qNew[stateAction] = rewards[stateAction].value + parseFloat(discountValue) * maxNextStepReward;
+                    }
+                }
+                let change = 0;
+                for (var stateAction in qOld) {
+                    change = Math.max(change, Math.abs(qOld[stateAction] - qNew[stateAction]));
+                }
+                if (change < parseFloat(epsilon)) return qNew;
+                qOld = qNew;
+            }
+        } else {
+            // finite horizon
+            
+        }
+    }
+
+    function runSimulation() {
+        if (!validateInputs()) return;
+        console.log("running simulation!");
     }
 
     function displayError(title: string, content: string) {
@@ -360,14 +398,10 @@
                 </select>
                 <label class:hyperparamLabel for="discount">Discount value (γ)</label>
                 <input type="text" name="discount" class:hyperparameter bind:value={discountValue} placeholder="0.0 to 1.0" />
-                <label class:hyperparamLabel for="learning">Learning rate (α)</label>
-                <input type="text" name="learning" class:hyperparameter bind:value={learningRate} placeholder="0.0 to 1.0" />
                 <label class:hyperparamLabel for="epsilon">Epsilon (ε)</label>
                 <input type="text" name="epsilon" class:hyperparameter bind:value={epsilon} placeholder="0.0 to 1.0" />
                 <label class:hyperparamLabel for="horizon">Horizon</label>
                 <input type="text" name="horizon" class:hyperparameter bind:value={horizon} placeholder="0, 1, 2, ..." />
-                <label class:hyperparamLabel for="iterations">Max number of iterations</label>
-                <input type="text" name="iterations" class:hyperparameter bind:value={maxIterations} placeholder="0, 1, 2, ..." />
             </div>
             <hr />
             <label for="policies">Policies</label>
@@ -392,7 +426,7 @@
             <hr />
             <div class="buttons">
                 <input type="submit" on:click={() => calculate()} value="Calculate" />
-                <input disabled type="submit" on:click={() => console.log("Run Simulation")} value="Run Simulation" title="Coming Soon!" />
+                <input type="submit" class="info" on:click={() => runSimulation()} value="Run Simulation" title="Coming Soon!" />
             </div>
             <div id="results" bind:this={results} />
         </div>
@@ -405,7 +439,7 @@
                 <input type="button" class="info" on:click={() => saveImg()} value="&#129518;" />
                 <input type="button" class="alarm" on:click={() => clearGraph()} value="Clear" />
             </div>
-            <MDPGraph bind:states={states} bind:actions={actions} bind:transitions={transitions} bind:rewards={rewards}/>
+            <MDPGraph bind:mdp={mdp} bind:states={states} bind:actions={actions} bind:transitions={transitions} bind:rewards={rewards}/>
         </div>
     </div>
 </div>

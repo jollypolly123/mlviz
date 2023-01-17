@@ -2,7 +2,8 @@
     let cy: cytoscape.Core;
 
     export function loadGraph(){
-        alert("Coming soon!")
+        alert("Coming soon!");
+        // TODO
         // var element = document.createElement("input");
         // element.type = "file";
         // element.onchange = function(event) {

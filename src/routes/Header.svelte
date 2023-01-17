@@ -19,15 +19,17 @@
 			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
 				<a href="/">Home</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
+			<!-- <li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
 				<a href="/about">About</a>
-			</li>
+			</li> -->
 			<!-- <li aria-current={$page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
 				<a href="/sverdle">Sverdle</a>
 			</li> -->
 			<li aria-current={$page.url.pathname.startsWith('/regression') ? 'page' : undefined}>
 				<a href="/regression">Regression</a>
 			</li>
+			<li aria-current={$page.url.pathname.startsWith('/feature-representation') ? 'page' : undefined}>
+				<a href="/feature-representation">Feature Representation</a>
 			<li aria-current={$page.url.pathname.startsWith('/clustering') ? 'page' : undefined}>
 				<a href="/clustering">Clustering</a>
 			</li>

@@ -15,10 +15,14 @@
     const inputClass = true;
 
     const addTag = (tag: string) => {
-        if (tag && !(tags.hasOwnProperty(tag))) {
+        if (tag && !(tags.hasOwnProperty(tag)) && !tag.includes("-")) {
             tags[tag] = {name: tag};
             if (color) tags[tag]["color"] = "#000000";
             tagInput.value = "";
+        } else if (!(tags.hasOwnProperty(tag))) {
+            alert("Tag already exists");
+        } else if (tag.includes("-")) {
+            alert("Tag must not contain the character '-'");
         }
     };
 
@@ -37,10 +41,9 @@
         }
     };
 
-    const handleColorChange = (e: Event) => {
+    const handleColorChange = (e: Event, tag: string) => {
         const target = e.target as HTMLInputElement;
         const color = target.value;
-        const tag = target.parentElement!.innerText.trim();
         tags[tag]["color"] = color;
     };
 
@@ -61,7 +64,7 @@
         <span class:tag>
             {tag}
             {#if color}
-            <input type="color" on:change={(e) => handleColorChange(e)}/>
+            <input type="color" on:change={(e) => handleColorChange(e, tag)}/>
             {/if}
             {#if deletable}
             <!-- svelte-ignore a11y-click-events-have-key-events -->

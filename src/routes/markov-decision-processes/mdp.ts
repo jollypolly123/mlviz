@@ -32,6 +32,10 @@ export class MDP {
 		this[category] = input;
 	}
 
+	// train(props) {
+
+	// }
+
 	clear() {
 		Object.keys(this.states).forEach(key => delete this.states[key]);
 		Object.keys(this.transitions).forEach(key => delete this.transitions[key]);
