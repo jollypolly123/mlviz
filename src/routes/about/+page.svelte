@@ -11,11 +11,11 @@
 	</p>
 
 	<ol>
-		<li>Regression</li>
+		<li><a href="/regression">Regression</a></li>
 		<li>Gradient Descent</li>
 		<li>Classifiers and Logistic Regression</li>
 		<li>Features</li>
-		<li>Clustering</li>
+		<li><a href="/clustering">Clustering</a></li>
 		<li>Neural Networks</li>
 		<li>Convolutional Neural Networks</li>
 		<li>State Machines and RNNs</li>

@@ -6,13 +6,14 @@
     import EditTransition from "$lib/components/markov-decision-processes/EditTransition.svelte";
     import TrainingHyperparameters from "$lib/components/markov-decision-processes/TrainingHyperparametersInstructions.svelte";
     import Modal, { getModal } from "$lib/components/Modal.svelte";
-    import type { States, Actions, Transitions, Rewards } from "$lib/types";
+    import type { States, Actions, Transitions, Rewards, Policies } from "$lib/types";
     import { MDP } from "./mdp";
     
 	const container = true;
     const inputRow = true;
     const hyperparameter = true;
     const hyperparamLabel = true;
+    const policyRule = true;
     const transition = true;
     const icon = true;
 	// export let data: PageData;
@@ -27,6 +28,7 @@
     let rewards: Rewards = {};
     let transitions: Transitions = {};
     let mdp: MDP;
+    let policies: Policies = [];
 
     let modalContent: any;
     let modalProps: { [key: string]: any } = {};
@@ -46,12 +48,14 @@
     let epsilon: number;
     let horizon: number;
     let maxIterations: number;
+    
+    let results: HTMLDivElement;
 
     function updateGraph(
         category: "states" | "actions" | "transitions" | "rewards",
         input: States | Actions | Transitions | Rewards,
     ) {
-        if (!mdp) mdp = new MDP({s: states, a: actions, t: transitions});
+        if (!mdp) mdp = new MDP({s: states, a: actions, t: transitions, r: rewards});
         mdp.update(category, input);
     }
 
@@ -59,17 +63,9 @@
         states = {};
         transitions = {};
         actions = {};
+        rewards = {};
+        policies = [];
         mdp.clear();
-    }
-
-    function editState(id: string, name: string) {
-        // states[id].name = name;
-        // states = states;
-    }
-
-    function editAction(id: string, name: string) {
-        // actions[id].name = name;
-        // actions = actions;
     }
 
     function addReward() {
@@ -140,25 +136,57 @@
         transitions = transitions;
     }
 
+    function addPolicy() {
+        policies = [...policies, Object.keys(states).map(state => {
+            return {
+                state: states[state],
+                action: ""
+            };
+        })];
+    }
+
+    function updatePoliciesStates() {
+        if (policies.length === 0) return;
+        var policyStates = policies[0].map(rule => {
+            return rule.state.name;
+        });
+        var newState = states[Object.keys(states).filter((stateID) => !policyStates.includes(stateID))[0]];
+        policies = policies.map(policy => {
+            return [...policy, {
+                state: newState,
+                action: ""
+            }];
+        });
+    }
+
     function calculate() {
-        if (initState === initStatePlaceholder || discountValue === undefined || learningRate === undefined || epsilon === undefined || horizon === undefined || maxIterations === undefined) {
-            displayError("Invalid Training Parameters", "Please enter valid training parameters.");
+        var errorMsg = "";
+        if (initState === initStatePlaceholder) errorMsg += "\nInitial State is unset. Please choose a state from the dropdown.";
+        if (discountValue === undefined) errorMsg += "\nDiscount Value is unset. Please enter a value between 0.0 and 1.0.";
+        if (learningRate === undefined) errorMsg += "\nLearning Rate is unset. Please enter a value between 0.0 and 1.0.";
+        if (epsilon === undefined) errorMsg += "\nEpsilon is unset. Please enter a value between 0.0 and 1.0.";
+        if (horizon === undefined) errorMsg += "\nHorizon is unset. Please enter an integer value.";
+        if (maxIterations === undefined) errorMsg += "\nMax Iterations is unset. Please enter an integer value.";
+        if (policies.length === 0) errorMsg += "\nNo policies have been added. Please add at least one policy.";
+
+        if (errorMsg !== "") {
+            displayError("Invalid Training Parameters", errorMsg);
         } else {
             console.log("calculating!");
-            // mdp.train({
-            //     initState: states[initState],
-            //     discountValue: discountValue,
-            //     learningRate: learningRate,
-            //     epsilon: epsilon,
-            //     horizon: horizon,
-            //     maxIterations: maxIterations
-            // });
+            for (let policy of policies) {
+                for (let i=0; i<maxIterations; i++) {
+                    // mdp.train({
+                    //     initState: states[initState],
+                    //     discountValue: discountValue,
+                    //     learningRate: learningRate,
+                    //     epsilon: epsilon,
+                    //     horizon: horizon,
+                    //     maxIterations: 1,
+                    //     policy: policy
+                    // });
+                }
+            }
         }
-        // let discountValue: number;
-        // let learningRate: number;
-        // let epsilon: number;
-        // let horizon: number;
-        // let maxIterations: number;
     }
 
     function displayError(title: string, content: string) {
@@ -177,6 +205,7 @@
         getModal().open();
     }
 
+    $: states, updatePoliciesStates();
     $: updateGraph("states", states);
     $: updateGraph("actions", actions);
     $: updateGraph("transitions", transitions);
@@ -190,6 +219,7 @@
 <div class:container>
     <h1>Markov Decision Process Visualization</h1>
     <p>Visualize Markov Decision Processes (MDPs) and calculate their value functions. This is meant to be a supplementary tool to interact with MDPs. If you don't know what a MDP is, I suggest checking out <a href="https://rojagtap.medium.com/understanding-the-markov-decision-process-mdp-8f838510f150">this article</a> then coming back!</p>
+    <p>Alternatively, here are the <a href="https://introml.mit.edu/_static/fall22/LectureNotes/chapter_Markov_Decision_Processes.pdf">class notes from Fall 2022</a>.</p>
 
     <div class="tool">
         <div class="inputs">
@@ -198,9 +228,8 @@
                 <span class:icon>&#9432;</span>
                 MDP Definition
             </h4>
-                <!-- TODO: fix modal content -->
-            <Tags bind:tags={states} title="States" placeholder="Enter state labels..." hover="Type the name of a state then press enter" color={true}/>
-            <Tags bind:tags={actions} title="Actions" placeholder="Enter action labels..." hover="Type the name of an action then press enter" color={true}/>
+            <Tags bind:tags={states} title="States" placeholder="Enter state labels..." hover="Type the name of a state then press enter" color={true} deletable={true}/>
+            <Tags bind:tags={actions} title="Actions" placeholder="Enter action labels..." hover="Type the name of an action then press enter" color={true} deletable={true}/>
             <div class:inputRow>
                 <label for="rewards">Rewards</label>
                 <input type="button" class="info" on:click={() => addReward()} value="Add Reward" />
@@ -329,30 +358,43 @@
                         </option>
                     {/each}
                 </select>
-                <label class:hyperparamLabel for="policies">Policies</label>
-                <!-- <select class:hyperparameter bind:value={initState}>
-                    <option value={initStatePlaceholder}>{initStatePlaceholder}</option>
-                    {#each Object.keys(states) as state}
-                        <option value={state}>
-                            {state}
-                        </option>
-                    {/each}
-                </select> -->
                 <label class:hyperparamLabel for="discount">Discount value (γ)</label>
-                <input type="text" name="discount" class:hyperparameter placeholder="0.0 to 1.0" />
+                <input type="text" name="discount" class:hyperparameter bind:value={discountValue} placeholder="0.0 to 1.0" />
                 <label class:hyperparamLabel for="learning">Learning rate (α)</label>
-                <input type="text" name="learning" class:hyperparameter placeholder="0.0 to 1.0" />
+                <input type="text" name="learning" class:hyperparameter bind:value={learningRate} placeholder="0.0 to 1.0" />
                 <label class:hyperparamLabel for="epsilon">Epsilon (ε)</label>
-                <input type="text" name="epsilon" class:hyperparameter placeholder="0.0 to 1.0" />
+                <input type="text" name="epsilon" class:hyperparameter bind:value={epsilon} placeholder="0.0 to 1.0" />
                 <label class:hyperparamLabel for="horizon">Horizon</label>
-                <input type="text" name="horizon" class:hyperparameter placeholder="0, 1, 2, ..." />
-                <label class:hyperparamLabel for="iterations">Number of iterations</label>
-                <input type="text" name="iterations" class:hyperparameter placeholder="0, 1, 2, ..." />
+                <input type="text" name="horizon" class:hyperparameter bind:value={horizon} placeholder="0, 1, 2, ..." />
+                <label class:hyperparamLabel for="iterations">Max number of iterations</label>
+                <input type="text" name="iterations" class:hyperparameter bind:value={maxIterations} placeholder="0, 1, 2, ..." />
             </div>
+            <hr />
+            <label for="policies">Policies</label>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <span class="add" on:click={() => addPolicy()}>&#8853;</span><br />
+            {#each policies as policyRules, i}
+                <strong><div>&#960;<sub>{i}</sub></div></strong>
+                {#each policyRules as rule}
+                <div class:policyRule>
+                    <label class:hyperparamLabel for="{rule.state.name}">{rule.state.name}</label>
+                    <select class:hyperparameter bind:value={rule.action}>
+                        <option value=""></option>
+                        {#each Object.keys(actions) as action}
+                            <option value={action}>
+                                {action}
+                            </option>
+                        {/each}
+                    </select>
+                </div>
+                {/each}
+            {/each}
+            <hr />
             <div class="buttons">
-                <input disabled type="submit" on:click={() => calculate()} value="Calculate" title="Coming Soon!" />
+                <input type="submit" on:click={() => calculate()} value="Calculate" />
                 <input disabled type="submit" on:click={() => console.log("Run Simulation")} value="Run Simulation" title="Coming Soon!" />
             </div>
+            <div id="results" bind:this={results} />
         </div>
         <div class="viz">
             <div class="graph-title">
@@ -428,6 +470,10 @@
         width: 60%;
         margin: 10px 0 10px 0;
     }
+    .policyRule {
+        display: inline-block;
+        width: 100%;
+    }
     .edit {
         color: var(--color-theme-2);
         font-size: 1.5rem;
@@ -438,6 +484,12 @@
         color: var(--color-alert);
         font-size: 1.5rem;
         margin: 0 0 0 1rem;
+        cursor: pointer;
+    }
+    .add {
+        color: var(--color-theme-2);
+        font-size: 1rem;
+        float: right;
         cursor: pointer;
     }
     .viz {

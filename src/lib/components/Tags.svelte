@@ -6,6 +6,8 @@
     export let title: string = "";
     export let hover: string = "";
     export let color: boolean = false;
+    export let deletable: boolean = false;
+    export let handleTagClick: (e: Event) => void = () => {};
 
     let tagInput: HTMLInputElement;
     let tagList: HTMLDivElement;
@@ -26,19 +28,13 @@
                 delete tags[t];
             }
         }
+        tags = tags;
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Enter") {
             addTag(tagInput.value);
         }
-    };
-
-    const handleTagClick = (e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        // open modal to edit or delete tag
-
-        // removeTag(target.innerText.trim());
     };
 
     const handleColorChange = (e: Event) => {
@@ -66,6 +62,10 @@
             {tag}
             {#if color}
             <input type="color" on:change={(e) => handleColorChange(e)}/>
+            {/if}
+            {#if deletable}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <span style="cursor: pointer" on:click={() => removeTag(tag)}>&#8855;</span>
             {/if}
         </span>
     {/each}

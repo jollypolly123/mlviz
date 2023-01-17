@@ -2,21 +2,22 @@
     let cy: cytoscape.Core;
 
     export function loadGraph(){
-        var element = document.createElement("input");
-        element.type = "file";
-        element.onchange = function(event) {
-            var file = (event.target as HTMLInputElement).files![0];
-            var reader = new FileReader();
-            reader.onload = function(event) {
-                var data = JSON.parse((event.target as FileReader).result as string);
-                // TODO: update states, actions, transitions, rewards etc ugh
-                cy.json(data);
-            };
-            reader.readAsText(file);
-        };
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+        alert("Coming soon!")
+        // var element = document.createElement("input");
+        // element.type = "file";
+        // element.onchange = function(event) {
+        //     var file = (event.target as HTMLInputElement).files![0];
+        //     var reader = new FileReader();
+        //     reader.onload = function(event) {
+        //         var data = JSON.parse((event.target as FileReader).result as string);
+        //         // TODO: update states, actions, transitions, rewards etc ugh
+        //         cy.json(data);
+        //     };
+        //     reader.readAsText(file);
+        // };
+        // document.body.appendChild(element);
+        // element.click();
+        // document.body.removeChild(element);
     }
 
 	export function saveGraph(){
@@ -92,7 +93,7 @@
             return acc;
         }, {});
         const newNodes = Object.keys(states).filter((stateID) => !(stateID in nodeIDs));
-        cy.add(newNodes.map((stateID) => ({ 
+        cy.add(newNodes.map((stateID) => ({
             group: 'nodes', 
             data: { id: stateID },
             position: { x: randInt(10, cy.width()-10), y: randInt(10, cy.height()-10) },

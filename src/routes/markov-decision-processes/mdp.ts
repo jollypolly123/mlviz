@@ -33,10 +33,10 @@ export class MDP {
 	}
 
 	clear() {
-        this.states = {};
-        this.transitions = {};
-        this.actions = {};
-		this.rewards = {};
+		Object.keys(this.states).forEach(key => delete this.states[key]);
+		Object.keys(this.transitions).forEach(key => delete this.transitions[key]);
+		Object.keys(this.actions).forEach(key => delete this.actions[key]);
+		Object.keys(this.rewards).forEach(key => delete this.rewards[key]);
 		return;
 	}
 

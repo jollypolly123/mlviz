@@ -25,6 +25,12 @@
 			<!-- <li aria-current={$page.url.pathname.startsWith('/sverdle') ? 'page' : undefined}>
 				<a href="/sverdle">Sverdle</a>
 			</li> -->
+			<li aria-current={$page.url.pathname.startsWith('/regression') ? 'page' : undefined}>
+				<a href="/regression">Regression</a>
+			</li>
+			<li aria-current={$page.url.pathname.startsWith('/clustering') ? 'page' : undefined}>
+				<a href="/clustering">Clustering</a>
+			</li>
 			<li aria-current={$page.url.pathname.startsWith('/markov-decision-processes') ? 'page' : undefined}>
 				<a href="/markov-decision-processes">Markov Decision Processes</a>
 			</li>

@@ -37,6 +37,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"cytoscape": "^3.23.0"
+		"@tensorflow/tfjs": "^4.2.0",
+		"cytoscape": "^3.23.0",
+		"scikitjs": "^1.24.0"
 	}
 }

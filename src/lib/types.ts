@@ -37,4 +37,11 @@ type Rewards = {
     [id: string]: Reward;
 }
 
-export type { State, States, Action, Actions, Transition, Transitions, Reward, Rewards };
+type Policy = {
+    state: State;
+    action: string;
+}[];
+
+type Policies = Policy[];
+
+export type { State, States, Action, Actions, Transition, Transitions, Reward, Rewards, Policy, Policies };
